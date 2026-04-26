@@ -1,0 +1,645 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Center | OrganFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body style="background: #f0f2f5;">
+
+<nav style="background: #2c3e50; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-user-shield" style="color: #e74c3c; font-size: 1.5rem;"></i>
+        <h2 style="margin:0; letter-spacing: 1px;">Admin <span style="font-weight: 300;">Console</span></h2>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <span style="opacity: 0.8;"><i class="fas fa-clock"></i> Server Time: 2026</span>
+        <a href="/logout" class="btn" style="background: #e74c3c; padding: 8px 20px;">Logout</a>
+    </div>
+</nav>
+
+<div class="container" style="max-width: 1300px;">
+
+<!-- ================= CARDS ================= -->
+
+<div style="display: grid;  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));  gap: 20px; margin-bottom: 30px;" class="animate__animated animate__fadeIn">
+  
+    <div class="card" onclick="showSection('usersSection')" 
+         style="cursor:pointer; text-align:center; padding:20px; border-bottom:4px solid #34495e;">
+         <h3 style="margin:0; font-size:0.9rem;">TOTAL USERS</h3>
+         <h2 style="margin:10px 0 0 0; font-size:2rem; color:#34495e;">
+             {{ users|length }}
+        </h2>
+    </div>
+
+    <div class="card" onclick="showSection('allDonors')" style="cursor:pointer; text-align: center; padding: 20px; border-bottom: 4px solid #3498db;">
+        <h3 style="margin:0; color: #7f8c8d; font-size: 0.9rem;">TOTAL PLEDGES</h3>
+        <h2 style="margin:10px 0 0 0; font-size: 2rem;">{{ donations|length }}</h2>
+    </div>
+
+    <div class="card" onclick="showSection('pendingDonors')" style="cursor:pointer; text-align: center; padding: 20px; border-bottom: 4px solid #e67e22;">
+        <h3 style="margin:0; color: #7f8c8d; font-size: 0.9rem;">PENDING REVIEW</h3>
+        <h2 style="margin:10px 0 0 0; font-size: 2rem; color: #e67e22;">
+            {{ donations|selectattr('status','equalto','Pending')|list|length }}
+        </h2>
+    </div>
+
+    <div class="card" onclick="showSection('approvedDonors')" style="cursor:pointer; text-align: center; padding: 20px; border-bottom: 4px solid #27ae60;">
+        <h3 style="margin:0; color: #7f8c8d; font-size: 0.9rem;">CERTIFICATES ISSUED</h3>
+        <h2 style="margin:10px 0 0 0; font-size: 2rem; color: #27ae60;">
+            {{ donations|selectattr('status','equalto','Approved')|list|length }}
+        </h2>
+    </div>
+
+    <div class="card" onclick="showSection('recipientSection')" style="cursor:pointer; text-align: center; padding: 20px; border-bottom: 4px solid #9b59b6;">
+        <h3 style="margin:0; color: #7f8c8d; font-size: 0.9rem;">TOTAL RECIPIENTS</h3>
+        <h2 style="margin:10px 0 0 0; font-size: 2rem; color: #9b59b6;">
+            {{ recipients|length }}
+        </h2>
+    </div>
+
+<div class="card" onclick="showSection('transplantSection')" 
+     style="cursor:pointer; text-align:center; padding:20px; border-bottom:4px solid #16a085;">
+    <h3 style="margin:0; color:#7f8c8d; font-size:0.9rem;">TRANSPLANT SECTION</h3>
+    <h2 style="margin:10px 0 0 0; font-size:2rem; color:#16a085;">
+        {{ transplants|length }}
+    </h2>
+</div>
+
+<div class="card" onclick="showTotalTransplants()" 
+     style="cursor:pointer; text-align:center; padding:20px; border-bottom:4px solid #16a085;">
+    <h3 style="margin:0; color:#7f8c8d; font-size:0.9rem;">TOTAL TRANSPLANTS</h3>
+    <h2 style="margin:10px 0 0 0; font-size:2rem; color:#16a085;">
+        {{ transplants|length }}
+    </h2>
+</div>
+
+
+</div>
+
+<div id="usersSection" style="display:none;">
+<div class="card animate__animated animate__fadeInUp" 
+     style="padding:0; overflow:hidden; margin-top:30px;">
+
+<div style="padding:20px; background:#f8f9fa; border-bottom:1px solid #eee;">
+    <h3 style="margin:0;">
+        <i class="fas fa-users"></i> Registered Users
+    </h3>
+</div>
+
+<table style="width:100%; border-collapse:collapse;">
+<thead>
+<tr style="background:#f8f9fa; text-transform:uppercase; font-size:0.85rem;">
+    <th style="padding:15px;">ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Role</th>
+</tr>
+</thead>
+
+<tbody>
+{% for u in users %}
+<tr style="border-bottom:1px solid #eee;"
+    onmouseover="this.style.background='#fcfcfc'"
+    onmouseout="this.style.background='white'">
+
+    <td style="padding:15px;">{{ u.id }}</td>
+    <td>{{ u.name }}</td>
+    <td>{{ u.email }}</td>
+    <td>
+        {% if u.role == "admin" %}
+            <span style="background:#e74c3c;color:white;padding:5px 12px;border-radius:20px;font-size:0.75rem;">
+                ADMIN
+            </span>
+        {% elif u.role == "donor" %}
+            <span style="background:#3498db;color:white;padding:5px 12px;border-radius:20px;font-size:0.75rem;">
+                DONOR
+            </span>
+        {% else %}
+            <span style="background:#9b59b6;color:white;padding:5px 12px;border-radius:20px;font-size:0.75rem;">
+                RECIPIENT
+            </span>
+        {% endif %}
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="4" style="padding:20px; text-align:center;">
+        No users found
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+
+<!-- ================= ALL DONORS ================= -->
+<div id="allDonors">
+
+<div class="card animate__animated animate__fadeInUp" style="padding: 0; overflow: hidden;">
+<div style="padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+<h3 style="margin:0;"><i class="fas fa-list"></i> Donor Management Queue</h3>
+<input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search donors or organs..." style="width: 300px; padding: 8px 15px; font-size: 0.9rem;">
+</div>
+
+<table id="donorTable" style="width: 100%; border-collapse: collapse; text-align: left;">
+<thead>
+<tr style="background: #f8f9fa; color: #7f8c8d; font-size: 0.85rem; text-transform: uppercase;">
+<th style="padding: 20px;">Donor Details</th>
+<th>Organ Type</th>
+<th>Blood Group</th>
+<th>Medical History</th>
+<th>Documents</th>
+<th>Status</th>
+<th style="text-align: center;">Actions</th>
+</tr>
+</thead>
+<tbody>
+{% for d in donations %}
+<tr style="border-bottom: 1px solid #eee; cursor:pointer;" 
+    onmouseover="this.style.background='#fcfcfc'" 
+    onmouseout="this.style.background='white'"
+    onclick="toggleDonor({{ d.id }})">
+   
+   
+<td style="padding: 20px;">
+  <div style="font-weight: bold; color: #2c3e50;">{{ d.full_name }}</div>
+  <div style="font-size: 0.8rem; color: #95a5a6;">
+    Age: {{ d.age }} | Ph: {{ d.phone }}<br>
+    {{ d.full_address or 'N/A' }}
+  </div>
+</td>
+<td>{{ d.organ }}</td>
+<td><strong style="color:#e74c3c;">{{ d.blood_group }}</strong></td>
+<!-- Donor Table Body -->
+<td>{{ d.medical_history or 'No history provided' }}</td>
+
+<td>
+{% if d.documents %}
+    {% for doc in d.documents.split(',') %}
+        <a href="{{ url_for('static', filename='uploads/' + doc) }}" target="_blank">
+            {{ doc }}
+        </a><br>
+    {% endfor %}
+{% else %}
+    No documents
+{% endif %}
+</td>
+<td>
+{% if d.status == 'Pending' %}
+    <span style="background:#fff9db; color:#f39c12; padding:5px 12px; border-radius:20px; font-size:0.75rem;">PENDING</span>
+{% else %}
+    <span style="background:#dff9fb; color:#0984e3; padding:5px 12px; border-radius:20px; font-size:0.75rem;">APPROVED</span>
+{% endif %}
+</td>
+<td style="text-align:center;">
+{% if d.status == "Pending" %}
+<a href="/approve/{{ d.id }}" style="background:#27ae60; color:white; padding:6px 12px; border-radius:5px; text-decoration:none;">Approve</a>
+<a href="/reject/{{ d.id }}" style="background:#e74c3c; color:white; padding:6px 12px; border-radius:5px; text-decoration:none;">Reject</a>
+{% else %}
+<a href="/download/{{ d.id }}" style="background:#34495e; color:white; padding:6px 12px; border-radius:5px; text-decoration:none;">View Cert</a>
+{% endif %}
+</td>
+</tr>
+<tr id="donor-details-{{ d.id }}" style="display:none; background:#f9f9f9;">
+<td colspan="7">
+    <div style="padding:20px; animation: fadeIn 0.3s ease-in-out;">
+
+        <h4 style="margin-top:0; color:#2c3e50;">Full Donor Details</h4>
+
+        <p><strong>Full Name:</strong> {{ d.full_name }}</p>
+        <p><strong>Age:</strong> {{ d.age }}</p>
+        <p><strong>Phone:</strong> {{ d.phone }}</p>
+        <p><strong>Blood Group:</strong> {{ d.blood_group }}</p>
+        <p><strong>Organ:</strong> {{ d.organ }}</p>
+        <p><strong>Address:</strong> {{ d.full_address }}</p>
+        <p><strong>Medical History:</strong> {{ d.medical_history or 'None' }}</p>
+        <p><strong>Submitted On:</strong> {{ d.created_at }}</p>
+
+        <div style="margin-top:15px;">
+            {% if d.status == "Pending" %}
+                <a href="/approve/{{ d.id }}" 
+                   style="background:#27ae60; color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">
+                   Approve
+                </a>
+
+                <a href="/reject/{{ d.id }}" 
+                   style="background:#e74c3c; color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">
+                   Reject
+                </a>
+            {% else %}
+                <a href="/download/{{ d.id }}" 
+                   style="background:#34495e; color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">
+                   View Certificate
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+
+<!-- ================= PENDING SECTION ================= -->
+<div id="pendingDonors" style="display:none;">
+<div class="card animate__animated animate__fadeInUp" style="padding: 0; overflow: hidden;">
+  
+<table style="width:100%; border-collapse: collapse;">
+  
+<tbody>
+{% for d in donations %}
+{% if d.status == "Pending" %}
+<tr>
+<td style="padding:20px;">{{ d.full_name }}</td>
+<td>{{ d.organ }}</td>
+<td>{{ d.blood_group }}</td>
+<td>{{ d.status }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+<!-- ================= APPROVED SECTION ================= -->
+<div id="approvedDonors" style="display:none;">
+<div class="card animate__animated animate__fadeInUp" style="padding: 0; overflow: hidden;">
+<table style="width:100%; border-collapse: collapse;">
+<tbody>
+{% for d in donations %}
+{% if d.status == "Approved" %}
+<tr>
+<td style="padding:20px;">{{ d.full_name }}</td>
+<td>{{ d.organ }}</td>
+<td>{{ d.blood_group }}</td>
+<td>{{ d.status }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+
+<!-- ================= RECIPIENTS ================= -->
+<div id="recipientSection" style="display:none;">
+<div class="card animate__animated animate__fadeInUp" style="padding: 0; overflow: hidden; margin-top: 30px;">
+<div style="padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee;">
+<h3 style="margin:0;"><i class="fas fa-procedures"></i> Recipient Management</h3><input type="text" id="recipientSearch" 
+       placeholder="Search recipient..." 
+       onkeyup="filterRecipients()"
+      style="width: 300px; padding:8px 15px; font-size:0.9rem; margin-left:20px;">
+</div>
+
+<table id="recipientTable" style="width: 100%; border-collapse: collapse;">
+<thead>
+<tr>
+<th style="padding:20px;">Name</th>
+<th>Age</th>
+<th>Organ</th>
+<th>Blood</th>
+<th>Contact</th>
+<th>Address</th>
+<th>Urgency</th>
+</tr>
+</thead>
+<tbody>
+{% for r in recipients %}
+<tr style="border-bottom: 1px solid #eee; cursor:pointer;"
+    onmouseover="this.style.background='#fcfcfc'"
+    onmouseout="this.style.background='white'"
+    onclick="toggleRecipient({{ r.id }})">
+   
+<td style="padding:20px;">{{ r.full_name }}</td>
+<td>{{ r.age }}</td>
+<td>{{ r.requested_organ }}</td>
+<td>{{ r.blood_group }}</td>
+<td>{{ r.phone }}</td>
+<td>{{ r.address }}</td>
+<td>{{ r.urgency }}</td>
+</tr>
+<tr id="recipient-details-{{ r.id }}" style="display:none; background:#f9f9f9;">
+<td colspan="5">
+
+    <div style="padding:20px; animation: fadeIn 0.3s ease-in-out;">
+
+        <h4 style="margin-top:0; color:#2c3e50;">Full Recipient Details</h4>
+
+        <p><strong>Full Name:</strong> {{ r.full_name }}</p>
+        <p><strong>Age:</strong> {{ r.age }}</p>
+        <p><strong>Blood Group:</strong> {{ r.blood_group }}</p>
+        <p><strong>Requested Organ:</strong> {{ r.requested_organ }}</p>
+        <p><strong>Contact:</strong> {{ r.phone }}</p>
+        <p><strong>Address:</strong> {{ r.address }}</p>
+        <p><strong>Urgency Level:</strong> {{ r.urgency }}</p>
+        <p><strong>Hospital:</strong> {{ r.hospital or 'Not Assigned' }}</p>
+        <p><strong>Submitted On:</strong> {{ r.created_at }}</p>
+
+        <div style="margin-top:15px;">
+            {% if r.status == "Pending" %}
+                <a href="/approve_recipient/{{ r.id }}" 
+                   style="background:#27ae60; color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">
+                   Approve
+                </a>
+                <a href="/reject_recipient/{{ r.id }}" 
+                   style="background:#e74c3c; color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">
+                   Reject
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+
+<!-- ================= TRANSPLANT SECTION ================= -->
+<div id="transplantSection" style="display:none;">
+
+<div class="card animate__animated animate__fadeInUp"
+     style="padding: 0; overflow:hidden; margin-top:30px;">
+
+    <!-- Header -->
+    <div style="padding:20px; background:#f8f9fa; border-bottom:1px solid #eee;">
+        <h3 style="margin:0;">
+            <i class="fas fa-hospital" style="color:#9b59b6;"></i>
+            Transplant Scheduling Panel
+        </h3>
+        <p style="margin:5px 0 0 0; font-size:0.85rem; color:#7f8c8d;">
+            Assign hospital & schedule surgery for matched donor-recipient pair
+        </p>
+    </div>
+
+    <!-- Form Body -->
+    <div style="padding:25px;">
+
+        <form method="POST" action="/create_transplant">
+
+            <!-- Donor -->
+            <label style="font-weight:600;">Approved Donor</label>
+            <select name="donor_id" required
+                    style="width:100%; padding:10px; margin-top:5px; border:1px solid #ddd; border-radius:5px;">
+                {% for d in donations %}
+                    {% if d.status == "Approved" %}
+                    <option value="{{ d.id }}">
+                        {{ d.full_name }} - {{ d.organ }} ({{ d.blood_group }})
+                    </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <!-- Recipient -->
+            <label style="margin-top:20px; font-weight:600;">Recipient</label>
+            <select name="recipient_id" required
+                    style="width:100%; padding:10px; margin-top:5px; border:1px solid #ddd; border-radius:5px;">
+                {% for r in recipients %}
+                <option value="{{ r.id }}">
+                    {{ r.full_name }} - {{ r.requested_organ }} ({{ r.blood_group }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Hospital -->
+            <label style="margin-top:20px; font-weight:600;">Hospital Name</label>
+            <input type="text" name="hospital" required
+                   placeholder="Enter hospital name"
+                   style="width:100%; padding:10px; margin-top:5px;
+                          border:1px solid #ddd; border-radius:5px;">
+
+            <!-- Date -->
+            <label style="margin-top:20px; font-weight:600;">Transplant Date</label>
+            <input type="date" name="transplant_date" required
+                   style="width:100%; padding:10px; margin-top:5px;
+                          border:1px solid #ddd; border-radius:5px;">
+
+            <!-- Button -->
+            <button type="submit"
+        style="margin-top:25px; width:100%;
+               background:#27ae60;
+               color:white;
+               padding:12px;
+               border:none;
+               border-radius:6px;
+               font-weight:600;
+               cursor:pointer;
+               transition:0.3s;">
+    Schedule Transplant
+</button>
+        </form>
+
+    </div>
+</div>
+</div>
+
+
+<!-- ================= TRANSPLANT TABLE (HIDDEN INITIALLY) ================= -->
+<div id="transplantTableSection" style="display:none; margin-top:20px;">
+    <div class="card animate__animated animate__fadeInUp" style="padding:0; overflow:hidden;">
+        <div style="padding:20px; background:#f8f9fa; border-bottom:1px solid #eee;">
+            <h3 style="margin:0;">
+                <i class="fas fa-clipboard-list" style="color:#16a085;"></i>
+                Transplant Records Details
+            </h3>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+            <thead>
+                <tr style="background:#f8f9fa; text-transform:uppercase; font-size:0.85rem;">
+                    <th style="padding:15px;">ID</th>
+                    <th>Donor</th>
+                    <th>Organ</th>
+                    <th>Recipient</th>
+                    <th>Hospital</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transplants %}
+                <tr style="border-bottom:1px solid #eee;"
+                    onmouseover="this.style.background='#fcfcfc'"
+                    onmouseout="this.style.background='white'">
+                    <td style="padding:15px;">{{ t.id }}</td>
+                    <td>{{ t.donor_name }}</td>
+                    <td><strong>{{ t.donor_organ }}</strong></td>
+                    <td>{{ t.recipient_name }}</td>
+                    <td>{{ t.hospital }}</td>
+                    <td>{{ t.transplant_date }}</td>
+                    <td>
+                        {% if t.status == "Completed" %}
+                            <span style="background:#d4edda; color:#155724; padding:5px 12px; border-radius:20px; font-size:0.75rem;">
+                                COMPLETED
+                            </span>
+                        {% else %}
+                            <span style="background:#fff3cd; color:#856404; padding:5px 12px; border-radius:20px; font-size:0.75rem;">
+                                {{ t.status }}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="padding:20px; text-align:center;">
+                        No transplant records found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+
+
+function searchTable(){
+var input=document.getElementById("searchInput");
+var filter=input.value.toLowerCase();
+var rows=document.querySelectorAll("#donorTable tbody tr");
+rows.forEach(function(row){
+row.style.display=row.innerText.toLowerCase().includes(filter)?"":"none";
+});
+}
+function filterRecipients() {
+    let input = document.getElementById("recipientSearch");
+    let filter = input.value.toLowerCase();
+    let table = document.getElementById("recipientTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+        let rowText = tr[i].innerText.toLowerCase();
+        if (rowText.includes(filter)) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+function toggleDonor(id){
+
+    // Close all other open rows (optional but professional)
+    var allRows = document.querySelectorAll("[id^='donor-details-']");
+    allRows.forEach(function(row){
+        if(row.id !== "donor-details-" + id){
+            row.style.display = "none";
+        }
+    });
+
+    var row = document.getElementById("donor-details-" + id);
+
+    if(row.style.display === "none" || row.style.display === ""){
+        row.style.display = "table-row";
+    } else {
+        row.style.display = "none";
+    }
+}
+
+function toggleRecipient(id){
+
+    // Close other open rows
+    var allRows = document.querySelectorAll("[id^='recipient-details-']");
+    allRows.forEach(function(row){
+        if(row.id !== "recipient-details-" + id){
+            row.style.display = "none";
+        }
+    });
+
+    var row = document.getElementById("recipient-details-" + id);
+
+    if(row.style.display === "none" || row.style.display === ""){
+        row.style.display = "table-row";
+    } else {
+        row.style.display = "none";
+    }
+}
+
+function showTotalTransplants() {
+    // Hide all other sections
+    document.getElementById("allDonors").style.display = "none";
+    document.getElementById("pendingDonors").style.display = "none";
+    document.getElementById("approvedDonors").style.display = "none";
+    document.getElementById("recipientSection").style.display = "none";
+    document.getElementById("transplantSection").style.display = "none";
+
+    // Show only transplant table section
+    let tableSection = document.getElementById("transplantTableSection");
+    tableSection.style.display = "block";
+
+    // Optional: scroll smoothly to table
+    tableSection.scrollIntoView({ behavior: "smooth" });
+}
+    // Count pending recipient requests
+   
+    // Get count of pending/new recipient requests from Flask
+    const newRequests = {{ recipients|selectattr('status','equalto','Pending')|list|length }};
+
+    if(newRequests > 0){
+        // Create toast popup
+        const toast = document.createElement('div');
+        toast.innerText = `You have ${newRequests} new organ request(s)!`;
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.right = '20px';
+        toast.style.background = '#e74c3c';
+        toast.style.color = 'white';
+        toast.style.padding = '12px 20px';
+        toast.style.borderRadius = '6px';
+        toast.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        toast.style.zIndex = '1000';
+        toast.style.fontWeight = '600';
+        toast.style.fontSize = '0.9rem';
+        toast.style.animation = 'fadeInOut 5s forwards';
+        document.body.appendChild(toast);
+
+        // Remove toast after 5 seconds
+        setTimeout(() => toast.remove(), 5000);
+
+        // Optional: Add CSS animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeInOut {
+                0% {opacity:0; transform: translateY(-20px);}
+                10% {opacity:1; transform: translateY(0);}
+                90% {opacity:1; transform: translateY(0);}
+                100% {opacity:0; transform: translateY(-20px);}
+            }
+        `;
+        document.head.appendChild(style);
+    }
+function showSection(id){
+
+document.getElementById("allDonors").style.display="none";
+document.getElementById("pendingDonors").style.display="none";
+document.getElementById("approvedDonors").style.display="none";
+document.getElementById("recipientSection").style.display="none";
+document.getElementById("transplantSection").style.display="none";
+document.getElementById("usersSection").style.display="none";
+document.getElementById("transplantTableSection").style.display="none";
+
+document.getElementById(id).style.display="block";
+}
+</script>
+
+</body>
+</html>

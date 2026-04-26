@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Us | OrganFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body style="background: #f0f2f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+
+<div class="register-container animate__animated animate__fadeInUp" style="width: 100%; max-width: 550px; background: white; border-radius: 20px; box-shadow: var(--shadow); overflow: hidden;">
+    
+    <div style="background: var(--accent); color: white; padding: 30px; text-align: center;">
+        <h2 style="margin: 0; font-size: 1.8rem;">Create Your Account</h2>
+        <p style="margin: 10px 0 0 0; opacity: 0.8;">Be a hero in someone's story</p>
+    </div>
+
+    <div style="padding: 40px;">
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-weight: 600;">Full Name</label>
+                    <input type="text" name="name" placeholder="John Doe" required>
+                </div>
+                <div>
+                    <label style="font-weight: 600;">Account Role</label>
+                    <select name="role" style="height: 48px;">
+                        <option value="donor">Donor (Hero)</option>
+                        <option value="recipient">Recipient (Patient)</option>
+                    </select>
+                </div>
+            </div>
+
+            <label style="font-weight: 600;">Email Address</label>
+            <input type="email" name="email" placeholder="john@example.com" required>
+
+            <label style="font-weight: 600;">Create Password</label>
+            <input type="password" name="password" placeholder="Minimum 8 characters" required>
+
+            <div style="background: #fff8f8; border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 25px; font-size: 0.9rem; color: #555;">
+                By registering, you agree to the medical data privacy terms and legal donation standards of 2026.
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; border-radius: 30px; text-transform: uppercase; font-weight: bold;">
+                Complete Registration
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <p>Already a member? <a href="/login" style="color: var(--primary); font-weight: 600;">Log in here</a></p>
+        </div>
+    </div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        {% for category, message in messages %}
+          Swal.fire({
+            icon: "{{ 'success' if category == 'success' else 'error' }}",
+            title: "{{ message }}",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "OK"
+          });
+        {% endfor %}
+      });
+    </script>
+  {% endif %}
+{% endwith %}
+</body>
+</html>                                  
+

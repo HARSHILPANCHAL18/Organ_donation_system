@@ -1,0 +1,64 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ========================
+# Flask / App Specific
+# ========================
+
+# SQLite databases (runtime data, not source code)
+*.db
+*.sqlite
+*.sqlite3
+
+# User-uploaded files (generated at runtime)
+static/uploads/
+
+# Generated certificate PDFs (generated at runtime)
+static/certificates/
+
+# Flask secret / environment config
+.env
+*.env
+
+# ========================
+# OS & IDE
+# ========================
+
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# PyCharm / JetBrains
+.idea/
+
+# ========================
+# Logs & Temp
+# ========================
+*.log
+*.tmp
+*.bak

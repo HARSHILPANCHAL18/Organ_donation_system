@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | OrganFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body style="background: #f0f2f5; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+
+<div class="login-container animate__animated animate__zoomIn" style="display: flex; width: 900px; height: 550px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+    
+    <div class="login-aside" style="flex: 1; background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover; color: white; padding: 40px; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Welcome Back</h2>
+        <p style="font-size: 1.1rem; opacity: 0.9;">"The measure of life is not its duration, but its donation."</p>
+        <div style="margin-top: 30px; font-size: 3rem;"><i class="fas fa-heartbeat"></i></div>
+    </div>
+
+    <div class="login-form-area" style="flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center;">
+        <div style="margin-bottom: 30px;">
+            <h2 style="color: var(--primary); margin: 0;">Portal Login</h2>
+            <p style="color: #777;">Secure access to your dashboard</p>
+        </div>
+
+        <form method="POST">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Email Address</label>
+                <input type="email" name="email" placeholder="Enter your registered email" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; transition: 0.3s;">
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Password</label>
+                <input type="password" name="password" placeholder="••••••••" required
+                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; transition: 0.3s;">
+            </div>
+            <div style="text-align:left; margin-top:5px; margin-bottom:20px;">
+            <a href="{{ url_for('forgot_password') }}" 
+               style="font-size:14px; color:#2c3e50; text-decoration:none;">Forgot Password?
+            </a>   
+            </div>
+            <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 1rem; letter-spacing: 1px;">
+                SIGN IN <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+            </button>
+        </form>
+
+        <div style="margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+            <span>Don't have an account?</span>
+            <a href="/register" style="color: var(--accent); font-weight: 700; text-decoration: none;"> Register Now</a>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <script>
+        Swal.fire({
+          icon: "{{ 'success' if category == 'success' else 'error' }}",
+          title: "{{ message }}",
+          timer: 2000,
+          showConfirmButton: false
+        });
+      </script>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+</body>
+</html> 

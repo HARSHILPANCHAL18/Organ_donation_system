@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recipient Dashboard | OrganFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-hospital-user" style="color: var(--accent); font-size: 1.5rem;"></i>
+        <h2 style="margin:0; color: var(--primary);">Recipient Portal</h2>
+    </div>
+    <a href="/logout" class="btn btn-secondary">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</nav>
+
+<div class="container">
+
+    <!-- STATUS CARD -->
+    <div class="animate__animated animate__fadeInDown" style="margin-bottom: 30px;">
+        <div class="card" style="background: linear-gradient(135deg, #2c3e50, #4ca1af); color: white;">
+            <h3>Request Status: <span style="color: #ffeaa7;">Active Search</span></h3>
+            <p>System is matching approved donors based on your requirements.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+        
+        <!-- LEFT SECTION -->
+        <div class="animate__animated animate__fadeInLeft">
+            <h3 style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-file-medical"></i> Update Requirement
+            </h3>
+
+            <div class="card">
+               <form method="POST">
+                 
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+            <label style="font-weight: 600;">Full Name</label>
+            <input type="text" name="full_name" value="{{ session.get('full_name', '') }}" required>
+       </div>
+        <div>
+            <label style="font-weight: 600;">Age</label>
+            <input type="number" name="age" required>
+        </div>
+        <div>
+            <label style="font-weight: 600;">Blood Group</label>
+            <input type="text" name="blood_group" required>
+        </div>
+        <div>
+            <label style="font-weight: 600;">Organ Required</label>
+            <input type="text" name="requested_organ" required>
+        </div>
+        
+          <div>
+        <label style="font-weight: 600;">Contact</label>
+        <input type="tel" name="phone" pattern="[0-9]{10}" maxlength="10" placeholder="Enter 10 digit number" required>
+    </div>
+
+    <!-- NEW FIELD -->
+    
+    
+    <div>
+        <label style="font-weight: 600;"> Full Address</label>
+        <input type="text" name="address" required>
+    </div>
+    </div>
+
+    <label style="font-weight: 600;">Urgency Level</label>
+    <select name="urgency" style="height: 50px; background: #fff;">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="Critical">Critical</option>
+       </select>
+  <!-- Submit Request Button -->
+<button type="submit" name="action" value="submit_request" class="btn" style="width:100%; margin-top:20px;">
+    Submit Request
+</button>
+
+<button type="submit"
+        name="action"
+        value="search_match"
+        formnovalidate
+        class="btn"
+        style="width:100%; margin-top:10px;">
+    Search Matching Donors
+</button>
+</form>
+            </div>
+
+            <!-- MATCHING DONORS SECTION -->
+            {% if matched_donors %}
+            <div class="card" style="margin-top: 30px;">
+                <h3><i class="fas fa-users"></i> Matching Donors Found</h3>
+
+                <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--primary); color: white;">
+                            <th style="padding: 10px;">Name</th>
+                            <th>Blood Group</th>
+                            <th>Organ</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donor in matched_donors %}
+                        <tr style="text-align: center; border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px;">{{ donor.full_name }}</td>
+                            <td>{{ donor.blood_group }}</td>
+                            <td>{{ donor.organ }}</td>
+                            <td>{{ donor.phone }}</td>
+                            <td>{{ donor.address }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT SECTION -->
+        <div class="animate__animated animate__fadeInRight">
+
+            <h3>Medical Resources</h3>
+
+            <div class="card" style="margin-bottom: 15px;">
+                <strong>Compatibility Guide</strong>
+                <p style="color: #666;">
+                    O- can donate to all.  
+                    AB+ can receive from all.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 15px;">
+                <strong>24/7 Helpline</strong>
+                <p style="color: #666;">
+                    Emergency Contact: +1-800-LIFE-GIVE
+                </p>
+            </div>
+
+            <!-- SUBMITTED REQUESTS DASHBOARD -->
+            {% if recipient_requests %}
+            <div class="card" style="margin-top: 20px;">
+                <h3><i class="fas fa-history"></i> Your Submitted Requests</h3>
+
+                <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--accent); color: white;">
+                            <th style="padding: 8px;">Organ</th>
+                            <th>Blood</th>
+                            <th>Urgency</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recipient_requests %}
+                        <tr style="text-align: center; border-bottom: 1px solid #eee;">
+                            <td style="padding: 8px;">{{ req.requested_organ }}</td>
+                            <td>{{ req.blood_group }}</td>
+                            <td>
+                                {% if req.urgency == 'Critical' %}
+                                    <span style="color:red; font-weight:bold;">{{ req.urgency }}</span>
+                                {% elif req.urgency == 'Medium' %}
+                                    <span style="color:orange;">{{ req.urgency }}</span>
+                                {% else %}
+                                    <span style="color:green;">{{ req.urgency }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ req.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card" style="margin-top: 20px; text-align:center; background:#fafafa;">
+                <p style="color:#999; padding:20px;">
+                    You have not submitted any requests yet.
+                </p>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+  
+    {% if assigned_transplants %}
+
+<div class="card" style="margin-top: 20px; background:#f0fff0; border-left:4px solid #27ae60;">
+    <h3><i class="fas fa-hospital"></i> Assigned Transplants</h3>
+    <table style="width: 100%; margin-top: 10px; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #27ae60; color:white;">
+                <th>Donor</th>
+                <th>Organ</th>
+                <th>Hospital</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in assigned_transplants %}
+            <tr style="text-align:center; border-bottom:1px solid #eee;">
+                <td>{{ t.donor_name }}</td>
+                <td>{{ t.donor_organ }}</td>
+                <td>{{ t.hospital }}</td>
+                <td>{{ t.transplant_date }}</td>
+                <td style="color:#27ae60; font-weight:bold;">{{ t.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      {% for category, message in messages %}
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.classList.add('animate__animated', 'animate__fadeInDown'); // Slide in from top
+            toast.addEventListener('animationend', () => {
+              toast.classList.remove('animate__fadeInDown');
+            });
+          }
+        });
+        Toast.fire({
+          icon: "{{ 'success' if category=='success' else 'error' }}",
+          title: "{{ message }}"
+        });
+      {% endfor %}
+    </script>
+  {% endif %}
+{% endwith %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Select the logout link
+document.querySelector('a[href="/logout"]').addEventListener('click', function(e){
+    e.preventDefault(); // Prevent default navigation
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out from your account.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#e74c3c",  // Red for YES
+        cancelButtonColor: "#3085d6",   // Blue for NO
+        confirmButtonText: "Yes, Logout",
+        cancelButtonText: "No"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // If user clicks yes, redirect to logout route
+            window.location.href = "/logout";
+        } 
+        // If No, do nothing, stays on the same page
+    });
+});
+</script>
+</body>
+</html>   
